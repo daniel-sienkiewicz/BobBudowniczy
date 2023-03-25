@@ -1,0 +1,33 @@
+services:
+  jenkins-master:
+    container_name: jenkins-master
+    image: jenkins/jenkins:lts
+    ports:
+      - 8080:8080
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - jenkins-network
+
+  jenkins-worker:
+    container_name: jenkins-worker
+    build:
+      context: Docker
+    ports:
+      - 22:22
+    networks:
+      - jenkins-network
+    tty: true
+
+volumes:
+  jenkins_home:
+    driver: local
+
+networks:
+  jenkins-network:
+    driver: bridge
